@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teamrollen nach Belbin · GetCon</title>
+<style>
+  /* ========== THEMING (GetCon) ========== */
+  :root, [data-theme="dark"]{
+    --bg:#0e1a21; --card:#16262e; --card-2:#1c2f38; --ink:#eaf0f3; --muted:#9fb3bc;
+    --line:#284048; --brand:#2d83b0; --brand-700:#246f97; --brand-ink:#fff;
+    --header:#0b212c; --soft:#16323f;
+    --action:#e8894f; --action-soft:#3a2a20;
+    --social:#37b39a; --social-soft:#12332e;
+    --think:#9a7ad6; --think-soft:#282142;
+    --good:#37b97f; --warn:#e0b84f; --bad:#e05e5e;
+    --shadow:0 4px 18px rgba(0,0,0,.35);
+  }
+  [data-theme="light"]{
+    --bg:#F5F3EE; --card:#FFFFFF; --card-2:#f6f4ef; --ink:#1c2b33; --muted:#5b6b73;
+    --line:#e3ddd2; --brand:#11445F; --brand-700:#0d3548; --brand-ink:#fff;
+    --header:#11445F; --soft:#eef3f1;
+    --action:#cf6f34; --action-soft:#fbeee3;
+    --social:#1f9a82; --social-soft:#e5f4f0;
+    --think:#7a56c0; --think-soft:#efeafa;
+    --good:#2e9e6b; --warn:#c79a2e; --bad:#c93f3f;
+    --shadow:0 2px 10px rgba(17,68,95,.08);
+  }
+  :root{--radius:16px; --maxw:900px;}
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.55; -webkit-font-smoothing:antialiased;
+    transition:background .25s,color .25s}
+  h1,h2,h3,h4{margin:0 0 .35em; line-height:1.25}
+  p{margin:.2em 0 .8em}
+  button{font-family:inherit; cursor:pointer; border:none; color:inherit}
+  a{color:var(--brand)}
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 18px 90px}
+
+  /* ========== HEADER + TABS ========== */
+  header.app{background:var(--header); color:#fff; position:sticky; top:0; z-index:30;
+    box-shadow:var(--shadow); border-bottom:3px solid var(--brand)}
+  header.app .bar{max-width:var(--maxw); margin:0 auto; padding:9px 18px; display:flex; align-items:center; gap:10px}
+  .logo{font-weight:800; font-size:1rem; display:flex; align-items:center; gap:8px; cursor:pointer; white-space:nowrap; color:#fff}
+  .logo .mk{font-size:1.3rem; line-height:1}
+  .hdr-actions{margin-left:auto; display:flex; gap:7px}
+  .iconbtn{background:rgba(255,255,255,.14); color:#fff; width:34px; height:34px; border-radius:50%;
+    font-size:1rem; display:flex; align-items:center; justify-content:center; flex:none}
+  .iconbtn:hover{background:rgba(255,255,255,.28)}
+  nav.tabs{max-width:var(--maxw); margin:0 auto; padding:0 12px 8px; display:flex; gap:4px; overflow-x:auto; scrollbar-width:none}
+  nav.tabs::-webkit-scrollbar{display:none}
+  .tab{background:rgba(255,255,255,.10); color:#fff; padding:7px 13px; border-radius:999px; font-size:.83rem;
+    font-weight:600; opacity:.82; white-space:nowrap; display:flex; align-items:center; gap:6px}
+  .tab:hover{opacity:1}
+  .tab.active{opacity:1; background:#fff; color:var(--header)}
+
+  /* ========== SCREENS ========== */
+  .screen{display:none; padding-top:24px; animation:fade .25s ease}
+  .screen.active{display:block}
+  @keyframes fade{from{opacity:0; transform:translateY(6px)}to{opacity:1; transform:none}}
+  .eyebrow{font-size:.76rem; font-weight:800; text-transform:uppercase; letter-spacing:.9px; color:var(--muted)}
+  .lead{color:var(--muted); max-width:64ch; font-size:1.02rem}
+  .hero{background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:28px; margin-bottom:18px}
+  .hero h1{font-size:1.7rem}
+  .card{background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:20px; margin-bottom:16px}
+
+  .btn{background:var(--brand); color:var(--brand-ink); padding:12px 20px; border-radius:12px; font-weight:700; font-size:.95rem; display:inline-flex; gap:8px; align-items:center}
+  .btn:hover{background:var(--brand-700)}
+  .btn.ghost{background:transparent; color:var(--brand); border:1.6px solid var(--brand)}
+  .btn.sm{padding:8px 14px; font-size:.85rem}
+  .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+  .spacer{flex:1}
+
+  .pill{display:inline-flex; align-items:center; gap:5px; padding:3px 11px; border-radius:999px; font-size:.74rem; font-weight:700}
+  .p-action{background:var(--action-soft); color:var(--action)}
+  .p-social{background:var(--social-soft); color:var(--social)}
+  .p-think{background:var(--think-soft); color:var(--think)}
+
+  /* category legend chips (filters) */
+  .filters{display:flex; gap:8px; flex-wrap:wrap; margin:16px 0 6px}
+  .fchip{background:var(--card); border:2px solid var(--line); border-radius:999px; padding:8px 15px; font-size:.85rem; font-weight:700; display:flex; align-items:center; gap:7px}
+  .fchip .dot{width:11px; height:11px; border-radius:50%}
+  .fchip.on.f-all{border-color:var(--brand); background:var(--soft)}
+  .fchip.on.f-action{border-color:var(--action); background:var(--action-soft)}
+  .fchip.on.f-social{border-color:var(--social); background:var(--social-soft)}
+  .fchip.on.f-think{border-color:var(--think); background:var(--think-soft)}
+  .d-action{background:var(--action)} .d-social{background:var(--social)} .d-think{background:var(--think)} .d-all{background:var(--brand)}
+
+  /* role grid */
+  .rgrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:14px; margin-top:14px}
+  .rcard{background:var(--card); border:2px solid var(--line); border-radius:16px; padding:16px; text-align:left;
+    border-top-width:5px; transition:transform .12s, box-shadow .12s; position:relative}
+  .rcard:hover{transform:translateY(-3px); box-shadow:var(--shadow)}
+  .rcard.c-action{border-top-color:var(--action)} .rcard.c-social{border-top-color:var(--social)} .rcard.c-think{border-top-color:var(--think)}
+  .rcard .ic{font-size:1.9rem; line-height:1}
+  .rcard .abbr{position:absolute; top:14px; right:14px; font-size:.72rem; font-weight:800; color:var(--muted); letter-spacing:.5px}
+  .rcard h3{font-size:1.08rem; margin:8px 0 2px}
+  .rcard .en{font-size:.8rem; color:var(--muted); font-weight:600}
+  .rcard .oneline{font-size:.88rem; color:var(--muted); margin-top:8px}
+  .rcard .more{margin-top:10px; font-size:.8rem; font-weight:700; color:var(--brand)}
+
+  /* role detail */
+  .detail-head{display:flex; align-items:flex-start; gap:16px; margin-bottom:6px}
+  .detail-head .ic{font-size:3rem; line-height:1}
+  .detail-head h2{font-size:1.5rem; margin:0}
+  .sect-label{font-size:.76rem; font-weight:800; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); margin:16px 0 4px}
+  ul.clean{margin:.2em 0 .8em; padding-left:1.15em}
+  ul.clean li{margin:.25em 0}
+  .box{border-radius:12px; padding:13px 15px; margin:8px 0}
+  .box.str{background:var(--social-soft); border-left:4px solid var(--social)}
+  .box.weak{background:var(--action-soft); border-left:4px solid var(--action)}
+  .box.need{background:var(--soft); border-left:4px solid var(--brand)}
+  .box.disg{background:var(--think-soft); border-left:4px solid var(--think)}
+  .box.big5{background:var(--soft); border-left:4px solid var(--brand)}
+  .tag-ok{font-size:.66rem; font-weight:800; padding:2px 7px; border-radius:6px; background:var(--social-soft); color:var(--social); vertical-align:middle; margin-left:4px}
+  .tag-maybe{font-size:.66rem; font-weight:800; padding:2px 7px; border-radius:6px; background:var(--action-soft); color:var(--action); vertical-align:middle; margin-left:4px}
+  .box h4{font-size:.95rem; margin:0 0 4px}
+  .box p{margin:0; font-size:.92rem}
+
+  /* info toggle */
+  .infotgl{display:inline-flex; align-items:center; gap:8px; background:var(--soft); color:var(--ink);
+    border:1.5px solid var(--line); border-radius:999px; padding:7px 14px; font-size:.83rem; font-weight:700; margin:6px 0}
+  .infotgl:hover{border-color:var(--brand)}
+  .infotgl .cd{transition:transform .2s; font-size:.75rem}
+  .infotgl.open .cd{transform:rotate(180deg)}
+  .collapse{display:none; margin:6px 0 4px}
+  .collapse.open{display:block}
+  .srcnote{font-size:.82rem; color:var(--muted); background:var(--card-2); border-radius:10px; padding:11px 14px; margin-top:8px}
+  .srcnote b{color:var(--ink)}
+
+  /* balance visual */
+  .balbar{display:flex; align-items:center; gap:12px; margin:12px 0}
+  .balbar .lab{width:130px; font-size:.85rem; font-weight:700; flex:none}
+  .track{flex:1; height:14px; background:var(--card-2); border-radius:999px; overflow:hidden; position:relative}
+  .fill{height:100%; border-radius:999px}
+  .cmp{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:12px}
+  @media(max-width:620px){.cmp{grid-template-columns:1fr}}
+  .cmp .col{border-radius:12px; padding:14px}
+  .cmp .too-few{background:var(--action-soft)} .cmp .too-many{background:var(--think-soft)}
+
+  /* transfer accordion */
+  .acc{border:1.5px solid var(--line); border-radius:12px; margin:10px 0; overflow:hidden}
+  .acc .q{padding:14px 16px; font-weight:700; display:flex; justify-content:space-between; gap:10px; align-items:center; cursor:pointer; background:var(--card)}
+  .acc .q .cd{transition:transform .2s; color:var(--muted)}
+  .acc.open .q .cd{transform:rotate(180deg)}
+  .acc .a{display:none; padding:0 16px 16px; color:var(--muted); font-size:.94rem}
+  .acc.open .a{display:block}
+
+  /* self-check */
+  .chk-item{background:var(--card); border:2px solid var(--line); border-radius:12px; padding:13px 15px; margin:9px 0;
+    display:flex; gap:12px; align-items:flex-start; cursor:pointer; transition:.12s}
+  .chk-item:hover{border-color:var(--brand)}
+  .chk-item.on{border-color:var(--good); background:var(--social-soft)}
+  .chk-box{width:22px; height:22px; border-radius:6px; border:2px solid var(--line); flex:none; display:flex; align-items:center; justify-content:center; font-weight:800; color:#fff; margin-top:1px}
+  .chk-item.on .chk-box{background:var(--good); border-color:var(--good)}
+  .chk-txt{font-size:.94rem}
+  .chk-txt .who{font-size:.76rem; color:var(--muted); font-weight:700; display:block; margin-top:2px}
+  .result{background:var(--card); border-radius:14px; padding:18px; margin-top:16px; box-shadow:var(--shadow)}
+  .res-role{display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--line)}
+  .res-role:last-child{border-bottom:none}
+  .res-role .ic{font-size:1.5rem}
+
+  /* sources */
+  .srcrow{border-bottom:1px solid var(--line); padding:12px 0}
+  .srcrow:last-child{border:none}
+  .srctag{display:inline-block; font-size:.68rem; font-weight:800; padding:2px 8px; border-radius:6px; margin-right:8px; vertical-align:middle}
+  .t-W{background:var(--social-soft); color:var(--social)}
+  .t-M{background:var(--think-soft); color:var(--think)}
+  .t-B{background:var(--action-soft); color:var(--action)}
+  .srcrow .cite{font-size:.9rem}
+  .srcrow .cite a{word-break:break-word}
+  .disclaimer{border:1.5px dashed var(--line); border-radius:12px; padding:14px 16px; margin:14px 0; font-size:.9rem; color:var(--muted)}
+
+  .footer{text-align:center; color:var(--muted); font-size:.78rem; margin-top:40px}
+  .hidden{display:none!important}
+</style>
+</head>
+<body data-theme="dark">
+
+<header class="app">
+  <div class="bar">
+    <div class="logo" onclick="go('start')"><span class="mk">🧭</span><span>Teamrollen nach Belbin</span></div>
+    <div class="hdr-actions">
+      <button class="iconbtn" id="themeBtn" title="Hell/Dunkel umschalten" onclick="toggleTheme()">🌙</button>
+    </div>
+  </div>
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-s="start" onclick="go('start')">Start</button>
+    <button class="tab" data-s="rollen" onclick="go('rollen')">🎭 Die 9 Rollen</button>
+    <button class="tab" data-s="balance" onclick="go('balance')">⚖️ Balance</button>
+    <button class="tab" data-s="transfer" onclick="go('transfer')">🔧 Praxis &amp; Transfer</button>
+    <button class="tab" data-s="check" onclick="go('check')">🪞 Selbst-Check</button>
+    <button class="tab" data-s="empirie" onclick="go('empirie')">📚 Empirie &amp; Quellen</button>
+  </nav>
+</header>
+
+<div class="wrap">
+
+  <!-- ================= START ================= -->
+  <section class="screen active" id="s-start">
+    <div class="hero">
+      <div class="eyebrow">Für Teams nach dem Teambuilding · GetCon</div>
+      <h1>Was ein Team stark macht – die 9 Teamrollen nach Belbin</h1>
+      <p class="lead">Warum funktionieren manche Teams wie von selbst und andere nicht? Meredith Belbin ist dieser Frage über <b>neun Jahre lang</b> mit einem Forschungsteam nachgegangen. Das Ergebnis: Nicht der schlaueste Kopf entscheidet über Erfolg, sondern <b>das Zusammenspiel unterschiedlicher Verhaltensbeiträge</b> im Team.</p>
+      <div class="row" style="margin-top:12px">
+        <button class="btn" onclick="go('rollen')">🎭 Die 9 Rollen ansehen</button>
+        <button class="btn ghost" onclick="go('empirie')">📚 Wie belegt ist das?</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>So ist das Modell aufgebaut</h3>
+      <p class="lead" style="font-size:.96rem">Belbin fasst die neun Rollen in <b>drei Kategorien</b> zusammen. Jede Rolle hat eine typische Stärke – und eine „erlaubte Schwäche", die untrennbar dazugehört. Genau diese Farb-Logik zieht sich durch die ganze App:</p>
+      <div class="filters" style="margin-top:10px">
+        <span class="fchip on f-action"><span class="dot d-action"></span>🔧 Handlungsorientiert</span>
+        <span class="fchip on f-social"><span class="dot d-social"></span>🗣️ Kommunikationsorientiert</span>
+        <span class="fchip on f-think"><span class="dot d-think"></span>🧠 Wissensorientiert</span>
+      </div>
+      <p style="font-size:.86rem; color:var(--muted); margin-top:8px">Je Kategorie drei Rollen. Eine Person bringt fast immer <b>mehrere</b> Rollen mit – dazu gleich mehr.</p>
+    </div>
+
+    <div class="card">
+      <h3>Drei Dinge vorab</h3>
+      <ul class="clean">
+        <li><b>Es geht zuerst um Verhalten – aber nicht beliebig.</b> Belbin beschreibt Beiträge, die ein Team braucht. Zugleich hängen manche Rollen eng mit stabilen Persönlichkeitsmerkmalen zusammen: Wer extrovertiert und beziehungsorientiert ist, findet sich fast automatisch in den kommunikationsorientierten Rollen wieder. Beides stimmt gleichzeitig – Verhalten <i>und</i> Persönlichkeit spielen mit hinein.</li>
+        <li><b>Eine Person = mehrere Rollen.</b> Die meisten Menschen haben zwei bis drei bevorzugte Rollen, weitere „machbare" und einige, die viel Kraft kosten.</li>
+        <li><b>Rollen sind (auch) kontextabhängig.</b> Als Projektleitung zeigst du andere Tendenzen als in einer Runde unter Gleichrangigen. Deshalb gilt: Ein echter Rollen-Test macht nur <b>bezogen auf einen konkreten Kontext</b> Sinn.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= ROLLEN ================= -->
+  <section class="screen" id="s-rollen">
+    <div id="rollen-list">
+      <div class="eyebrow">Die 9 Teamrollen</div>
+      <h2>Wähle eine Rolle für Details</h2>
+      <p class="lead">Filtere nach Kategorie oder tippe auf eine Karte. In der Detailansicht findest du Beitrag, Stärken, die erlaubte Schwäche, wann das Team die Rolle besonders braucht – und optional die DISG-Parallele.</p>
+      <div class="filters" id="filters">
+        <button class="fchip on f-all" data-f="all" onclick="setFilter('all')"><span class="dot d-all"></span>Alle</button>
+        <button class="fchip f-action" data-f="action" onclick="setFilter('action')"><span class="dot d-action"></span>🔧 Handlung</button>
+        <button class="fchip f-social" data-f="social" onclick="setFilter('social')"><span class="dot d-social"></span>🗣️ Kommunikation</button>
+        <button class="fchip f-think" data-f="think" onclick="setFilter('think')"><span class="dot d-think"></span>🧠 Wissen</button>
+      </div>
+      <div class="rgrid" id="rgrid"></div>
+    </div>
+
+    <div id="rollen-detail" class="hidden"></div>
+  </section>
+
+  <!-- ================= BALANCE ================= -->
+  <section class="screen" id="s-balance">
+    <div class="eyebrow">Rollengleichgewicht</div>
+    <h2>Balance – der eigentliche Kern des Modells</h2>
+    <p class="lead">Belbins wichtigste Erkenntnis war nicht „welche Rolle ist die beste", sondern: <b>Das Gleichgewicht entscheidet.</b> Fehlt eine Rolle, entsteht eine Lücke. Ist eine Rolle zu stark vertreten, kippt sie ins Gegenteil.</p>
+
+    <div class="card">
+      <h3>Was Übergewicht in der Praxis anrichtet</h3>
+      <p style="color:var(--muted); font-size:.94rem">Zwei Beispiele, die man bei komplexen Teamaufgaben immer wieder erlebt:</p>
+      <div class="cmp">
+        <div class="col too-many">
+          <h4>🚀 Ein Team fast nur aus <b>Machern</b></h4>
+          <p style="font-size:.9rem; color:var(--muted)">Legt sofort los – optimistisch, tatendurstig, fast naiv, ohne konkreten Plan. Manchmal geht das gut. Meist aber gelingt es nur mit Ach und Krach, weil niemand prüft, plant und zu Ende bringt.</p>
+        </div>
+        <div class="col too-many">
+          <h4>📏 Ein Team fast nur aus <b>Perfektionisten</b></h4>
+          <p style="font-size:.9rem; color:var(--muted)">Diskutiert, wägt ab und feilt – bis die Zeit um ist und am Ende kein Ergebnis dasteht. Der Anspruch blockiert das Loslegen.</p>
+        </div>
+      </div>
+      <div class="srcnote">💡 Der Kern: <b>Die eine Stärke wird zur Schwäche, wenn sie im Team allein dominiert.</b> Antrieb ohne Prüfung wird zu Aktionismus; Sorgfalt ohne Antrieb wird zu Stillstand. Jede Rolle darf da sein – aber keine allein. Ein Team aus vier Personen kann bereits alle neun Rollen abdecken, weil jede Person mehrere mitbringt.</div>
+    </div>
+
+    <div class="card">
+      <h3>👀 Wach bleiben und gegensteuern</h3>
+      <p style="font-size:.94rem">Der eigentliche Hebel liegt nicht in der „perfekten Mischung", sondern in der <b>Aufmerksamkeit</b>: Wenn ein Team – oder die Teamleitung – bemerkt, dass eine Rolle überwiegt und andere fehlen, lässt sich bewusst gegensteuern. Ein Team aus lauter Vertrieblern (viele Macher/Wegbereiter) kann z.&nbsp;B. gezielt jemanden bitten, die Rolle des nüchternen Prüfers oder Qualitätssicherers zu übernehmen.</p>
+      <div class="srcnote">Übergewichtungen wahrnehmen → benennen → eine fehlende Rolle bewusst besetzen. Das ist der praktische Nutzen des Balance-Gedankens.</div>
+    </div>
+
+    <div class="card">
+      <h3>Wie belegt ist der Balance-Gedanke?</h3>
+      <p style="font-size:.94rem">Balance ist nicht irgendein Aspekt, sondern <b>die zentrale These von Belbins Arbeit</b>: Sein Buch heißt nicht umsonst „Warum Teams gelingen oder scheitern". Der Gedanke stammt <b>direkt aus seiner Beobachtungsforschung</b> in Henley – er ist empirisch <i>entstanden</i>, nicht ausgedacht.</p>
+      <p style="font-size:.94rem">Das bekannteste Beleg-Stück ist das <b>„Apollo-Syndrom":</b> Teams aus lauter hochintelligenten Menschen schnitten <b>überraschend schlecht</b> ab – sie verloren sich in Ego-Debatten, statt zusammenzuarbeiten. Genau das zeigte Belbin: Nicht Einzeltalent, sondern die <b>Zusammensetzung</b> entscheidet. Ergänzend beschrieb er, dass zu wenige <i>und</i> zu viele Träger einer Rolle beide schaden.</p>
+      <button class="infotgl" onclick="tgl(this)">Was unabhängige Studien dazu sagen <span class="cd">▾</span></button>
+      <div class="collapse">
+        <p style="font-size:.92rem; color:var(--muted)">Was <b>gemischt</b> ausfällt, sind die späteren Versuche, den Zusammenhang „Balance → messbar mehr Leistung" statistisch nachzuweisen: Einige Untersuchungen finden positive Effekte (z.&nbsp;B. Meslec &amp; Curşeu bei Lerngruppen; Senior bei 11 Management-Teams), andere keinen klaren – oft mit kleinen oder studentischen Stichproben. Nutze Balance daher als starkes <b>Denk- und Gesprächswerkzeug</b> und Praxis-Beobachtung, nicht als Leistungsgarantie durch eine Formel.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TRANSFER ================= -->
+  <section class="screen" id="s-transfer">
+    <div class="eyebrow">Von der Theorie ins Team</div>
+    <h2>Praxis &amp; Transfer</h2>
+    <p class="lead">Wissen wirkt erst, wenn es im Alltag ankommt. Hier findest du konkrete Wege, wie ihr Belbin als Team weiter nutzt – ohne teuren Test, mit dem, was ihr schon habt: euch selbst.</p>
+
+    <div id="transfer-acc"></div>
+
+    <div class="card" style="margin-top:16px">
+      <h3>🎯 Ein einfacher Einstieg für euer nächstes Meeting</h3>
+      <ul class="clean">
+        <li>Jede:r nennt <b>eine Rolle</b>, in der sie/er sich am wohlsten fühlt – und eine, die im Team gerade <b>fehlt</b>.</li>
+        <li>Schaut gemeinsam: Welche Kategorie (Handlung / Kommunikation / Wissen) ist bei euch <b>überbesetzt</b>, welche <b>dünn</b>?</li>
+        <li>Vereinbart <b>eine</b> kleine Änderung: Wer übernimmt bewusst eine fehlende Rolle für das nächste Projekt?</li>
+      </ul>
+      <div class="srcnote">Wichtig: Sprecht über <b>Verhalten in Situationen</b> („wer sorgt bei uns dafür, dass wir fertig werden?"), nicht über feste Etiketten für Personen.</div>
+    </div>
+  </section>
+
+  <!-- ================= SELBST-CHECK ================= -->
+  <section class="screen" id="s-check">
+    <div class="eyebrow">Leichter Reflexions-Check</div>
+    <h2>Welche Rollen fühlen sich nach dir an?</h2>
+    <div class="disclaimer">
+      ⚠️ <b>Kein validierter Test.</b> Dies ist ein Reflexions-Impuls, kein offizieller Belbin-Test. Der echte Test (Self-Perception Inventory) ist urheberrechtlich geschützt und wird über <a href="https://www.belbin.com" target="_blank" rel="noopener">belbin.com</a> durchgeführt. Denk beim Ankreuzen an einen <b>konkreten Kontext</b> (z.&nbsp;B. dein aktuelles Team) – in einer anderen Rolle würdest du vielleicht anders antworten.
+    </div>
+    <p class="lead">Kreuze die Aussagen an, die sich für dich <b>vertraut</b> anfühlen. Am Ende siehst du, welche Rollen und Kategorien bei dir anklingen.</p>
+    <div id="check-list"></div>
+    <div class="row" style="margin-top:14px">
+      <button class="btn" onclick="showCheck()">Auswertung anzeigen</button>
+      <button class="btn ghost sm" onclick="resetCheck()">Zurücksetzen</button>
+    </div>
+    <div id="check-result"></div>
+  </section>
+
+  <!-- ================= EMPIRIE ================= -->
+  <section class="screen" id="s-empirie">
+    <div class="eyebrow">Wie viel Forschung steckt dahinter?</div>
+    <h2>Empirie &amp; Quellen</h2>
+    <p class="lead">Belbin hat das Modell nicht „erfunden", sondern über Jahre <b>beobachtet und getestet</b>. Gleichzeitig gehört zur Ehrlichkeit: Auch dieses Modell hat wissenschaftliche Grenzen. Beides findest du hier.</p>
+
+    <div class="card">
+      <h3>📐 Woher die Erkenntnisse kommen</h3>
+      <ul class="clean">
+        <li><b>Neun Jahre Forschung</b> am Administrative Staff College in Henley (heute Henley Business School), ab 1969.</li>
+        <li>Ein interdisziplinäres Team: Belbin mit dem Psychologen Roger Mottram, der Anthropologin Jeanne Fisher und dem Mathematiker &amp; Schach-Meister Bill Hartson.</li>
+        <li>Untersucht wurden <b>Management-Teams in Planspielen</b> – rund drei Spiele pro Jahr mit je acht Teams. Jede Person durchlief eine Batterie psychometrischer Tests.</li>
+        <li>Zentrales Ergebnis: Nicht Intelligenz, sondern <b>Verhalten</b> unterschied erfolgreiche von scheiternden Teams. Daraus wurden neun „Verhaltens-Cluster" – die Teamrollen. (Die neunte, der Spezialist, kam erst später aus der Praxis dazu.)</li>
+      </ul>
+      <div class="srcnote">Nachzulesen in Belbins Buch <b>„Management Teams: Why They Succeed or Fail"</b> (1981) und auf der offiziellen Forschungsseite von Belbin.</div>
+    </div>
+
+    <div class="card">
+      <h3>🔬 Was die unabhängige Wissenschaft sagt</h3>
+      <p style="font-size:.94rem">Belbins Fragebogen (Self-Perception Inventory) wurde vielfach überprüft – mit gemischtem Ergebnis:</p>
+      <ul class="clean">
+        <li><b>Kritik:</b> Furnham, Steele &amp; Pendleton (1993) fanden schwache psychometrische Kennwerte des Selbst-Fragebogens (geringe interne Konsistenz, unklare Faktorenstruktur).</li>
+        <li><b>Belbins Antwort:</b> Teamrollen seien <b>keine Persönlichkeitsmerkmale</b>, sondern Verhaltensmuster im Zusammenspiel – und dürften nicht wie stabile Traits gemessen werden.</li>
+        <li><b>Ausgewogene Gesamtbilanz:</b> Aritzeta, Swailes &amp; Senior (2007) werteten 43 empirische Studien aus. Fazit: insgesamt <b>brauchbare konvergente Validität</b>, aber <b>schwache Trennschärfe</b> zwischen einigen Rollen.</li>
+      </ul>
+      <button class="infotgl" onclick="tgl(this)">Und der Bezug zu Persönlichkeit? <span class="cd">▾</span></button>
+      <div class="collapse">
+        <p style="font-size:.92rem; color:var(--muted)">Wissenschaftlich am besten belegt ist der Zusammenhang mit den <b>„Big Five"</b> (Fünf-Faktoren-Modell): z.&nbsp;B. Wegbereiter ↔ Extraversion, Erfinder ↔ Offenheit, Teamarbeiter ↔ Verträglichkeit, Beobachter ↔ Gewissenhaftigkeit (Broucek &amp; Randell 1996; Fisher u.&nbsp;a. 2001). Der in dieser App gezeigte Bezug zu <b>DISG</b> ist dagegen eine <b>Praxis-Brücke</b> zur schnellen Orientierung – kein empirisch abgesicherter 1:1-Zusammenhang.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>🧩 Kurz erklärt: Die „Big Five"</h3>
+      <p style="font-size:.94rem">Die Big Five (Fünf-Faktoren-Modell, u.&nbsp;a. Costa &amp; McCrae) sind das in der Psychologie am besten abgesicherte Persönlichkeitsmodell. Sie beschreiben fünf Dimensionen, auf denen jede Person irgendwo liegt:</p>
+      <ul class="clean">
+        <li><b>Offenheit</b> für Erfahrung – Fantasie, Neugier, unkonventionelles Denken.</li>
+        <li><b>Gewissenhaftigkeit</b> – Sorgfalt, Disziplin, Zuverlässigkeit.</li>
+        <li><b>Extraversion</b> – Kontaktfreude, Energie nach außen, Durchsetzung.</li>
+        <li><b>Verträglichkeit</b> – Kooperation, Empathie, Harmoniestreben.</li>
+        <li><b>Neurotizismus</b> – emotionale Empfindlichkeit, Neigung zu Sorge/Anspannung.</li>
+      </ul>
+      <p style="font-size:.94rem">Studien ordnen mehrere Belbin-Rollen diesen Dimensionen zu – z.&nbsp;B. Wegbereiter ↔ Extraversion, Erfinder ↔ Offenheit, Teamarbeiter ↔ Verträglichkeit, Umsetzer/Beobachter ↔ Gewissenhaftigkeit (Broucek &amp; Randell 1996; Fisher u.&nbsp;a. 2001). Bei jeder Rolle findest du diesen Bezug – mit dem Hinweis <span class="tag-ok">belegt</span> oder <span class="tag-maybe">plausibel</span>.</p>
+      <div class="srcnote"><b>Kurz kundig machen:</b> gute, seriöse Übersicht z.&nbsp;B. bei <a href="https://en.wikipedia.org/wiki/Big_Five_personality_traits" target="_blank" rel="noopener">Wikipedia: Big Five personality traits ↗</a> · Primärquelle: Costa &amp; McCrae (1992), NEO-PI-R.</div>
+    </div>
+
+    <div class="card">
+      <h3>🔗 DISG vs. Big Five – warum beide dabei sind</h3>
+      <p style="font-size:.94rem">DISG (nach W. M. Marston, 1928) beschreibt Verhalten über zwei Achsen: <b>aktiv ↔ zurückhaltend</b> und <b>sach- ↔ menschenorientiert</b>. Genau solche Dimensionen tauchen auch bei Belbin und in den Big Five auf – deshalb wirken die Parallelen intuitiv stimmig. Der Unterschied: Der Bezug zu den <b>Big Five ist wissenschaftlich untersucht</b>, die konkrete Zuordnung Belbin↔<b>DISG</b> ist es nicht – sie bleibt eine <b>Praxis-Brücke</b> für alle, die DISG bereits im Einsatz haben. Bei jeder Rolle findest du beide Parallelen nebeneinander.</p>
+      <button class="btn ghost sm" onclick="go('rollen')">Zu den Rollen (dort je Rolle beide Parallelen)</button>
+    </div>
+
+    <div class="card">
+      <h3>📚 Quellen zum Nachlesen</h3>
+      <div id="sources"></div>
+      <p style="font-size:.78rem; color:var(--muted); margin-top:12px">Legende: <span class="srctag t-W">W</span> wissenschaftlich · <span class="srctag t-B">B</span> Belbin/Primärquelle · <span class="srctag t-M">M</span> Modell/Fachliteratur</p>
+    </div>
+  </section>
+
+  <div class="footer">GetCon · Teambuilding &amp; Teamentwicklung</div>
+</div>
+
+<script>
+/* ================= DATEN ================= */
+const CAT = {
+  action:{name:"Handlungsorientiert", icon:"🔧", cls:"c-action", pill:"p-action"},
+  social:{name:"Kommunikationsorientiert", icon:"🗣️", cls:"c-social", pill:"p-social"},
+  think:{name:"Wissensorientiert", icon:"🧠", cls:"c-think", pill:"p-think"}
+};
+
+const ROLES = [
+  {id:"sh", cat:"action", icon:"🚀", abbr:"SH", de:"Macher", en:"Shaper",
+   one:"Treibt an und sorgt dafür, dass es vorangeht.",
+   task:"Treibt und formt Teamaktivitäten, überwindet Hindernisse und liefert Ergebnisse – auch unter Druck.",
+   str:["Durchsetzungsfähig und lösungsorientiert","Arbeitet gut unter Druck","Bringt Energie und Richtung, extrovertiert"],
+   weak:"Kann provozieren, ungeduldig und wenig rücksichtsvoll sein; leicht zu frustrieren.",
+   need:"Wenn ein Team Antrieb, Tempo und Entschlossenheit braucht – besonders bei Stillstand.",
+   disg:"D (Dominant)", disgnote:"aktiv + sachorientiert: geht direkt auf Ziele zu.",
+   big5:"eher niedrige Verträglichkeit; Anspannung/Antrieb", big5ok:false, big5note:"Durchsetzung und Reibung; Belbin/Broucek & Randell verknüpfen den Macher theoretisch mit höherer emotionaler Anspannung (Neurotizismus). Weniger eindeutig belegt."},
+
+  {id:"imp", cat:"action", icon:"🛠️", abbr:"IMP", de:"Umsetzer", en:"Implementer",
+   one:"Macht aus Plänen verlässliche Arbeitsschritte.",
+   task:"Setzt Konzepte und Ideen in praktische, systematische Abläufe um und bringt Dinge ins Rollen.",
+   str:["Diszipliniert und verlässlich","Effizient und organisiert","Bringt Struktur in komplexe Aufgaben"],
+   weak:"Eher unflexibel; reagiert etwas verzögert auf neue Möglichkeiten.",
+   need:"Wenn aus Ideen konkrete, umsetzbare Pläne werden müssen.",
+   disg:"G (Gewissenhaft), leichte S-Tendenz", disgnote:"strukturiert, beständig, sachorientiert.",
+   big5:"Gewissenhaftigkeit", big5ok:true, big5note:"Disziplin, Verlässlichkeit, systematisches Arbeiten. Broucek & Randell (1996) fanden für den Umsetzer eine Nähe zur Gewissenhaftigkeit."},
+
+  {id:"cf", cat:"action", icon:"📏", abbr:"CF", de:"Perfektionist", en:"Completer-Finisher",
+   one:"Sichert Qualität und bringt Dinge sauber zu Ende.",
+   task:"Vermeidet Fehler, prüft auf Herz und Nieren, sichert Qualität und hält Fristen ein.",
+   str:["Sehr gewissenhaft und detailorientiert","Hohes Qualitätsbewusstsein","Zuverlässig, meist introvertiert"],
+   weak:"Neigt zu übertriebener Sorge, delegiert ungern, kann sich in Details verlieren.",
+   need:"Am Ende einer Aufgabe – überall, wo Präzision und Fehlerfreiheit zählen.",
+   disg:"G (Gewissenhaft)", disgnote:"genau, qualitätsbewusst, zurückhaltend.",
+   big5:"Gewissenhaftigkeit (+ Neigung zur Sorge)", big5ok:true, big5note:"Sorgfalt und Qualitätsanspruch (Gewissenhaftigkeit); die Neigung, sich zu sorgen, verknüpften Broucek & Randell (1996) zusätzlich mit Neurotizismus."},
+
+  {id:"co", cat:"social", icon:"🧭", abbr:"CO", de:"Koordinator", en:"Co-ordinator",
+   one:"Klärt Ziele und holt alle ins Boot.",
+   task:"Ermuntert zu Beiträgen, hält den Überblick, klärt Rollen und fördert Entscheidungen.",
+   str:["Selbstsicher und zielorientiert","Delegiert gut","Moderiert Entscheidungsfindung, extrovertiert"],
+   weak:"Kann als manipulierend wirken; delegiert bisweilen auch die eigene Arbeit.",
+   need:"Wenn ein Team Orientierung, klare Rollen und moderierte Entscheidungen braucht.",
+   disg:"I mit D-Einschlag", disgnote:"aktiv + menschenorientiert, mit Zielfokus.",
+   big5:"Extraversion", big5ok:false, big5note:"Selbstsicheres Auftreten, Menschen einbinden und moderieren spricht für Extraversion. Für den Koordinator ist der Big-Five-Bezug plausibel, aber weniger eindeutig belegt als bei anderen Rollen."},
+
+  {id:"tw", cat:"social", icon:"🤝", abbr:"TW", de:"Teamarbeiter", en:"Teamworker",
+   one:"Hält das Team menschlich zusammen.",
+   task:"Fördert Zusammenhalt und Kommunikation, baut Spannungen ab, hilft bei Konflikten.",
+   str:["Kooperativ und empathisch","Diplomatisch","Baut Spannungen ab, harmoniefördernd"],
+   weak:"Kann konfliktscheu und in kritischen Situationen unentschlossen sein.",
+   need:"Wenn es im Team knirscht oder der Zusammenhalt gestärkt werden soll.",
+   disg:"S (Stetig)", disgnote:"zurückhaltend + menschenorientiert, beständig.",
+   big5:"Verträglichkeit", big5ok:true, big5note:"Kooperation, Empathie, Harmoniestreben. Broucek & Randell (1996) fanden für den Teamarbeiter eine klare Nähe zur Verträglichkeit."},
+
+  {id:"ri", cat:"social", icon:"🌐", abbr:"RI", de:"Wegbereiter", en:"Resource Investigator",
+   one:"Öffnet Türen nach außen und bringt Impulse.",
+   task:"Sucht externe Quellen und Kontakte, erkundet Möglichkeiten und Chancen.",
+   str:["Extrovertiert und kommunikativ","Enthusiastisch","Knüpft Kontakte, entdeckt Chancen"],
+   weak:"Verliert nach dem ersten Enthusiasmus schnell das Interesse; bringt Dinge selten zu Ende.",
+   need:"Besonders in frühen Phasen – für Netzwerk, Ideen von außen und neue Optionen.",
+   disg:"I (Initiativ)", disgnote:"aktiv + menschenorientiert, begeisterungsfähig.",
+   big5:"Extraversion", big5ok:true, big5note:"Kontaktfreude, Enthusiasmus, nach außen gerichtet. Broucek & Randell (1996) fanden für den Wegbereiter eine klare Nähe zur Extraversion."},
+
+  {id:"pl", cat:"think", icon:"💡", abbr:"PL", de:"Erfinder", en:"Plant",
+   one:"Liefert den kreativen Funken und neue Ideen.",
+   task:"Bringt neue Ideen und Strategien ein, löst schwierige Probleme unkonventionell.",
+   str:["Kreativ und einfallsreich","Denkt unkonventionell","Starke Problemlösefähigkeit"],
+   weak:"Ignoriert Nebensächlichkeiten; kann Ideen schwer verständlich kommunizieren.",
+   need:"Wenn Innovation, frische Ansätze oder kreative Problemlösung gefragt sind.",
+   disg:"kreativ-strategisch, leichte I-/D-Tendenz", disgnote:"eigenständig, ideengetrieben.",
+   big5:"Offenheit für Erfahrung", big5ok:true, big5note:"Fantasie, unkonventionelles Denken, Ideenreichtum. Broucek & Randell (1996) fanden für den Erfinder eine klare Nähe zur Offenheit."},
+
+  {id:"me", cat:"think", icon:"🔍", abbr:"ME", de:"Beobachter", en:"Monitor Evaluator",
+   one:"Prüft nüchtern, was wirklich trägt.",
+   task:"Untersucht Ideen und Vorschläge sachlich auf Machbarkeit und Nutzen fürs Ziel.",
+   str:["Nüchterner Analytiker","Trennt Emotion von Logik","Wohlüberlegte Urteile, eher introvertiert"],
+   weak:"Kann wenig begeistern und motivieren; wirkt mitunter distanziert oder kritisch.",
+   need:"Wenn ein Team euphorisch oder impulsiv wird und einen kühlen Kopf braucht.",
+   disg:"G (Gewissenhaft)", disgnote:"analytisch, zurückhaltend, sachorientiert.",
+   big5:"Gewissenhaftigkeit (eher introvertiert)", big5ok:true, big5note:"Nüchternes, sorgfältiges Abwägen. Broucek & Randell (1996) fanden für den Beobachter eine Nähe zur Gewissenhaftigkeit; das Zurückhaltende deutet zudem auf geringere Extraversion."},
+
+  {id:"sp", cat:"think", icon:"📚", abbr:"SP", de:"Spezialist", en:"Specialist",
+   one:"Bringt tiefes Fachwissen ein.",
+   task:"Steuert seltenes Wissen und Fähigkeiten bei; arbeitet fachlich in die Tiefe.",
+   str:["Große fachliche Tiefe","Engagiert und antriebsstark im Thema","Unverzichtbar bei Spezialfragen"],
+   weak:"Verliert sich leicht in Details; Beitrag oft auf ein enges Fachgebiet begrenzt.",
+   need:"Überall, wo fachliche Qualität und Spezialwissen entscheidend sind.",
+   disg:"G (Gewissenhaft)", disgnote:"fachfokussiert, sachorientiert.",
+   big5:"am ehesten Gewissenhaftigkeit (Fachfokus)", big5ok:false, big5note:"Hingabe an das eigene Fachgebiet spricht für Gewissenhaftigkeit; für den Spezialisten ist der Big-Five-Bezug in der Forschung aber nicht eindeutig belegt."}
+];
+
+const TRANSFER = [
+  {q:"Wie erkennen wir unsere Rollen ohne teuren Test?",
+   a:"Im Gespräch. Beschreibt konkrete Situationen: Wer sorgt bei uns dafür, dass wir fertig werden? Wer bringt die Ideen? Wer glättet die Wogen? Aus solchen Beispielen lassen sich Rollen viel ehrlicher ableiten als aus Selbst-Etiketten – und ganz ohne den (geschützten) Original-Test."},
+  {q:"Was tun wir, wenn eine Rolle im Team fehlt?",
+   a:"Erst bewusst machen, dann verteilen. Oft kann jemand eine „machbare“ Rolle bewusst übernehmen (z.B. bewusst als Beobachter Ideen prüfen). Alternativ gezielt jemanden hinzuholen. Wichtig: Eine fehlende Rolle ist kein Vorwurf, sondern ein blinder Fleck, den man gemeinsam abdeckt."},
+  {q:"Wie nutzen wir Rollen im Alltag – nicht nur einmalig?",
+   a:"Klein und wiederkehrend. Zu Projektstart kurz klären, welche Rollen gebraucht werden und wer sie übernimmt. In Retros fragen: Welche Rolle war überbesetzt, welche fehlte? So wird Belbin zur Routine statt zum Einmal-Workshop."},
+  {q:"Dürfen wir Menschen auf eine Rolle festlegen?",
+   a:"Nein. Rollen sind Verhalten in einem Kontext, keine Persönlichkeits-Schubladen. Dieselbe Person zeigt in anderem Umfeld andere Rollen. Redet deshalb über Beiträge in Situationen, nicht über feste Etiketten für Personen."},
+  {q:"Was, wenn alle ähnliche Rollen haben?",
+   a:"Häufig und normal – z.B. viele Macher in einem Vertriebsteam. Dann bewusst gegensteuern: Wer übernimmt die fehlenden Beiträge (Ruhe reinbringen, Ideen prüfen, Qualität sichern)? Vielfalt lässt sich auch trainieren, nicht nur einstellen."}
+];
+
+const SOURCES = [
+  {tag:"B", txt:"Belbin, R. M. (1981/2010): <b>Management Teams. Why They Succeed or Fail.</b> Butterworth-Heinemann. — Primärquelle des Modells.", url:""},
+  {tag:"B", txt:"Belbin Associates: <b>The Research</b> (offizielle Darstellung der Henley-Studie).", url:"https://www.belbin.com/about/the-research"},
+  {tag:"B", txt:"Belbin Associates: <b>The Nine Belbin Team Roles</b> (Rollen &amp; erlaubte Schwächen).", url:"https://www.belbin.com/about/belbin-team-roles"},
+  {tag:"B", txt:"Belbin Associates: <b>Apollo Teams</b> – das „Apollo-Syndrom“: Teams aus hochintelligenten Personen scheitern häufig an fehlender Zusammenarbeit.", url:"https://www.belbin.com/resources/articles-directory/belbin-apollo-teams"},
+  {tag:"W", txt:"Aritzeta, A., Swailes, S. &amp; Senior, B. (2007): <b>Belbin's Team Role Model: Development, Validity and Applications for Team Building.</b> Journal of Management Studies, 44(1), 96–118. — Review von 43 Studien.", url:"https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1467-6486.2007.00666.x"},
+  {tag:"W", txt:"Furnham, A., Steele, H. &amp; Pendleton, D. (1993): <b>A psychometric assessment of the Belbin Team-Role Self-Perception Inventory.</b> Journal of Occupational and Organizational Psychology, 66. — Kritik am Fragebogen.", url:"https://bpspsychub.onlinelibrary.wiley.com/doi/abs/10.1111/j.2044-8325.1993.tb00535.x"},
+  {tag:"W", txt:"Broucek, W. G. &amp; Randell, G. (1996): <b>An assessment of the construct validity of the Belbin Self-Perception Inventory and Observer's Assessment from the perspective of the five-factor model.</b> JOOP, 69. — Zuordnung der Rollen zu den Big Five.", url:"https://bpspsychub.onlinelibrary.wiley.com/doi/10.1111/j.2044-8325.1996.tb00625.x"},
+  {tag:"W", txt:"Fisher, S. G., Hunter, T. A. &amp; Macrosson, W. D. K. (2001): <b>A validation study of Belbin's team roles.</b> European Journal of Work and Organizational Psychology, 10(2), 121–144. — Bezug zum Fünf-Faktoren-Modell.", url:"https://www.tandfonline.com/doi/abs/10.1080/13594320143000591"},
+  {tag:"M", txt:"Costa, P. T. &amp; McCrae, R. R. (1992): <b>NEO-PI-R Professional Manual.</b> — Standardwerk zum Fünf-Faktoren-Modell (Big Five).", url:""},
+  {tag:"M", txt:"Marston, W. M. (1928): <b>Emotions of Normal People.</b> — Ursprung des DISG-/DISC-Modells (hier nur als Verhaltens-Brücke, nicht als Beleg der Belbin-Zuordnung).", url:""}
+];
+
+/* ================= STATE ================= */
+let filter="all";
+const checked={};
+
+/* ================= NAV ================= */
+function go(s){
+  document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
+  document.getElementById('s-'+s).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.s===s));
+  if(s==='rollen'){ document.getElementById('rollen-list').classList.remove('hidden'); document.getElementById('rollen-detail').classList.add('hidden'); }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function tgl(btn){ btn.classList.toggle('open'); const c=btn.nextElementSibling; if(c&&c.classList.contains('collapse')) c.classList.toggle('open'); }
+function toggleTheme(){
+  const b=document.body, now=b.getAttribute('data-theme')==='dark'?'light':'dark';
+  b.setAttribute('data-theme',now); document.documentElement.setAttribute('data-theme',now);
+  document.getElementById('themeBtn').textContent = now==='dark'?'🌙':'☀️';
+  try{localStorage.setItem('belbin-theme',now)}catch(e){}
+}
+
+/* ================= ROLLEN ================= */
+function renderRoles(){
+  const g=document.getElementById('rgrid'); g.innerHTML='';
+  ROLES.filter(r=>filter==='all'||r.cat===filter).forEach(r=>{
+    const c=CAT[r.cat];
+    const el=document.createElement('button');
+    el.className='rcard '+c.cls;
+    el.onclick=()=>showRole(r.id);
+    el.innerHTML=`<span class="abbr">${r.abbr}</span><div class="ic">${r.icon}</div>
+      <h3>${r.de}</h3><div class="en">${r.en}</div>
+      <span class="pill ${c.pill}" style="margin-top:8px">${c.icon} ${c.name}</span>
+      <div class="oneline">${r.one}</div>
+      <div class="more">Details ansehen →</div>`;
+    g.appendChild(el);
+  });
+}
+function setFilter(f){
+  filter=f;
+  document.querySelectorAll('#filters .fchip').forEach(c=>c.classList.toggle('on', c.dataset.f===f));
+  renderRoles();
+}
+function showRole(id){
+  const r=ROLES.find(x=>x.id===id), c=CAT[r.cat];
+  const d=document.getElementById('rollen-detail');
+  d.innerHTML=`
+    <button class="btn ghost sm" onclick="backToList()">← Alle Rollen</button>
+    <div class="card ${c.cls}" style="border-top:5px solid var(--${r.cat==='action'?'action':r.cat==='social'?'social':'think'}); margin-top:14px">
+      <div class="detail-head">
+        <div class="ic">${r.icon}</div>
+        <div>
+          <span class="pill ${c.pill}">${c.icon} ${c.name}</span>
+          <h2 style="margin-top:6px">${r.de} <span style="color:var(--muted); font-weight:600; font-size:1rem">· ${r.en} (${r.abbr})</span></h2>
+        </div>
+      </div>
+      <div class="sect-label">Aufgabe im Team</div>
+      <p>${r.task}</p>
+
+      <div class="box str"><h4>⭐ Stärken</h4>
+        <ul class="clean" style="margin-bottom:0">${r.str.map(s=>`<li>${s}</li>`).join('')}</ul></div>
+
+      <div class="box weak"><h4>⚠️ Erlaubte Schwäche</h4><p>${r.weak}</p></div>
+
+      <div class="box need"><h4>🎯 Wann das Team diese Rolle braucht</h4><p>${r.need}</p></div>
+
+      <button class="infotgl" onclick="tgl(this)">🔗 Persönlichkeits-Parallelen (optional) <span class="cd">▾</span></button>
+      <div class="collapse">
+        <div class="box disg"><h4>DISG-Tendenz: ${r.disg}</h4>
+          <p>${r.disgnote}</p>
+          <p style="font-size:.82rem; color:var(--muted); margin-top:6px">DISG als schnelle Praxis-Brücke, wenn du das Modell kennst – kein empirisch belegter 1:1-Zusammenhang.</p>
+        </div>
+        <div class="box big5"><h4>Big-Five-Bezug: ${r.big5} ${r.big5ok?'<span class="tag-ok">belegt</span>':'<span class="tag-maybe">plausibel</span>'}</h4>
+          <p>${r.big5note}</p>
+          <p style="font-size:.82rem; color:var(--muted); margin-top:6px">Der Bezug zu den „Big Five" ist wissenschaftlich am besten untersucht. <a href="#" onclick="go('empirie');return false">Kurz erklärt &amp; Quellen →</a></p>
+        </div>
+      </div>
+
+      <div class="srcnote">Quelle: Rollenbeschreibung &amp; erlaubte Schwäche nach Belbin (siehe „Empirie &amp; Quellen").</div>
+    </div>`;
+  document.getElementById('rollen-list').classList.add('hidden');
+  d.classList.remove('hidden');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function backToList(){
+  document.getElementById('rollen-detail').classList.add('hidden');
+  document.getElementById('rollen-list').classList.remove('hidden');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ================= TRANSFER ================= */
+function renderTransfer(){
+  const w=document.getElementById('transfer-acc'); w.innerHTML='';
+  TRANSFER.forEach((t,i)=>{
+    const el=document.createElement('div'); el.className='acc';
+    el.innerHTML=`<div class="q" onclick="this.parentElement.classList.toggle('open')">${t.q}<span class="cd">▾</span></div><div class="a">${t.a}</div>`;
+    w.appendChild(el);
+  });
+}
+
+/* ================= SELBST-CHECK ================= */
+function renderCheck(){
+  const w=document.getElementById('check-list'); w.innerHTML='';
+  ROLES.forEach(r=>{
+    const c=CAT[r.cat];
+    const el=document.createElement('div'); el.className='chk-item'; el.dataset.id=r.id;
+    el.onclick=()=>{ checked[r.id]=!checked[r.id]; el.classList.toggle('on',checked[r.id]); };
+    el.innerHTML=`<div class="chk-box">✓</div><div class="chk-txt">${r.icon} ${r.task}
+      <span class="who">${c.icon} ${r.de} · ${c.name}</span></div>`;
+    w.appendChild(el);
+  });
+}
+function resetCheck(){
+  Object.keys(checked).forEach(k=>delete checked[k]);
+  document.querySelectorAll('#check-list .chk-item').forEach(e=>e.classList.remove('on'));
+  document.getElementById('check-result').innerHTML='';
+}
+function showCheck(){
+  const sel=ROLES.filter(r=>checked[r.id]);
+  const res=document.getElementById('check-result');
+  if(!sel.length){ res.innerHTML='<div class="result">Kreuze zuerst ein paar Aussagen an, die zu dir passen.</div>'; return; }
+  const catCount={action:0,social:0,think:0}; sel.forEach(r=>catCount[r.cat]++);
+  const top=Object.entries(catCount).sort((a,b)=>b[1]-a[1]).filter(x=>x[1]>0);
+  res.innerHTML=`<div class="result">
+    <h3>Deine anklingenden Rollen</h3>
+    <p style="color:var(--muted); font-size:.9rem">${sel.length} von 9 ausgewählt. Das ist ein Reflexions-Impuls, kein Test – in einem anderen Kontext könnte es anders aussehen.</p>
+    ${sel.map(r=>{const c=CAT[r.cat];return `<div class="res-role"><span class="ic">${r.icon}</span><div><b>${r.de}</b> <span style="color:var(--muted)">· ${r.en}</span><br><span class="pill ${c.pill}" style="margin-top:4px">${c.icon} ${c.name}</span></div></div>`}).join('')}
+    <div class="srcnote" style="margin-top:14px"><b>Schwerpunkt:</b> ${top.map(t=>CAT[t[0]].icon+' '+CAT[t[0]].name+' ('+t[1]+')').join(' · ')}.
+    Frag dich: Passt das zu dem, was dein Team gerade <i>braucht</i>? Wo ist eine Rolle, die du bewusst häufiger einnehmen könntest?</div>
+    <div class="row" style="margin-top:12px"><button class="btn ghost sm" onclick="go('balance')">→ Was Balance bedeutet</button></div>
+  </div>`;
+  res.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+/* ================= SOURCES ================= */
+function renderSources(){
+  const w=document.getElementById('sources'); w.innerHTML='';
+  SOURCES.forEach(s=>{
+    const el=document.createElement('div'); el.className='srcrow';
+    el.innerHTML=`<span class="srctag t-${s.tag}">${s.tag}</span><span class="cite">${s.txt}${s.url?` <a href="${s.url}" target="_blank" rel="noopener">↗ öffnen</a>`:''}</span>`;
+    w.appendChild(el);
+  });
+}
+
+/* ================= INIT ================= */
+(function(){
+  try{const t=localStorage.getItem('belbin-theme'); if(t){document.body.setAttribute('data-theme',t); document.documentElement.setAttribute('data-theme',t); document.getElementById('themeBtn').textContent=t==='dark'?'🌙':'☀️';}}catch(e){}
+  renderRoles(); renderTransfer(); renderCheck(); renderSources();
+})();
+</script>
+</body>
+</html>
